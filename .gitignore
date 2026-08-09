@@ -1,0 +1,13 @@
+# Downloaded third-party source files are intentionally not versioned.
+data/raw/
+
+# Python caches and local test/build by-products.
+__pycache__/
+analysis/__pycache__/
+tests/__pycache__/
+.pytest_cache/
+*.pyc
+
+# Local web-server logs.
+*.log
+
