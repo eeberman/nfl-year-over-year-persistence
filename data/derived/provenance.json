@@ -1,0 +1,207 @@
+{
+  "analysis_period": {
+    "start": 2006,
+    "end": 2025,
+    "seasons": 20
+  },
+  "retrieved_at_utc": "2026-08-08T17:23:33Z",
+  "sources": {
+    "play_by_play": {
+      "2006": {
+        "url": "https://github.com/nflverse/nflverse-data/releases/download/pbp/play_by_play_2006.csv.gz",
+        "local_cache": "data/raw/play_by_play_2006.csv.gz",
+        "retrieved_at_utc": "2026-08-08T16:41:02Z",
+        "sha256": "d569c37a14000864392283006cae6f1ac43b4bb9e904fa1568db8cc8eb952d08",
+        "bytes": 17478126,
+        "downloaded_this_run": false
+      },
+      "2007": {
+        "url": "https://github.com/nflverse/nflverse-data/releases/download/pbp/play_by_play_2007.csv.gz",
+        "local_cache": "data/raw/play_by_play_2007.csv.gz",
+        "retrieved_at_utc": "2026-08-08T16:41:03Z",
+        "sha256": "fa436bf2cc476e8a0dc044a0e516e88e48f74f8342de2effa2262fdacac2adb0",
+        "bytes": 17618113,
+        "downloaded_this_run": false
+      },
+      "2008": {
+        "url": "https://github.com/nflverse/nflverse-data/releases/download/pbp/play_by_play_2008.csv.gz",
+        "local_cache": "data/raw/play_by_play_2008.csv.gz",
+        "retrieved_at_utc": "2026-08-08T16:41:04Z",
+        "sha256": "d889f7f473304763ed00cb4e8f26cb110122ea5b712f49b4e94d3e5c19dab483",
+        "bytes": 17469625,
+        "downloaded_this_run": false
+      },
+      "2009": {
+        "url": "https://github.com/nflverse/nflverse-data/releases/download/pbp/play_by_play_2009.csv.gz",
+        "local_cache": "data/raw/play_by_play_2009.csv.gz",
+        "retrieved_at_utc": "2026-08-08T16:41:07Z",
+        "sha256": "15a6424d6629c1f02803e26b85bbbec9f2c43f48cf20f0f737cbb82e99855dd3",
+        "bytes": 17819486,
+        "downloaded_this_run": false
+      },
+      "2010": {
+        "url": "https://github.com/nflverse/nflverse-data/releases/download/pbp/play_by_play_2010.csv.gz",
+        "local_cache": "data/raw/play_by_play_2010.csv.gz",
+        "retrieved_at_utc": "2026-08-08T16:41:08Z",
+        "sha256": "6d4f519b4821f06ffe2285faadad8cee718f464eeb9a310a8276753da10bee2e",
+        "bytes": 17960191,
+        "downloaded_this_run": false
+      },
+      "2011": {
+        "url": "https://github.com/nflverse/nflverse-data/releases/download/pbp/play_by_play_2011.csv.gz",
+        "local_cache": "data/raw/play_by_play_2011.csv.gz",
+        "retrieved_at_utc": "2026-08-08T16:41:09Z",
+        "sha256": "ffa0bfb803f0c30a4b765af5e621b0f601d695efdba7d6d396fb067d6a0c89b2",
+        "bytes": 18021304,
+        "downloaded_this_run": false
+      },
+      "2012": {
+        "url": "https://github.com/nflverse/nflverse-data/releases/download/pbp/play_by_play_2012.csv.gz",
+        "local_cache": "data/raw/play_by_play_2012.csv.gz",
+        "retrieved_at_utc": "2026-08-08T16:41:10Z",
+        "sha256": "ff1cda2e26610ef8720324e442d1e5ebc24918e08fd1d2933590b7b91a7068cd",
+        "bytes": 18195788,
+        "downloaded_this_run": false
+      },
+      "2013": {
+        "url": "https://github.com/nflverse/nflverse-data/releases/download/pbp/play_by_play_2013.csv.gz",
+        "local_cache": "data/raw/play_by_play_2013.csv.gz",
+        "retrieved_at_utc": "2026-08-08T16:41:11Z",
+        "sha256": "b4cd0dc48697ec44a2041d57dfc1c7210a792d1b5be497c161ef20a5b7fb9942",
+        "bytes": 18339628,
+        "downloaded_this_run": false
+      },
+      "2014": {
+        "url": "https://github.com/nflverse/nflverse-data/releases/download/pbp/play_by_play_2014.csv.gz",
+        "local_cache": "data/raw/play_by_play_2014.csv.gz",
+        "retrieved_at_utc": "2026-08-08T16:41:12Z",
+        "sha256": "4ab286d2873a7eab28e11120f1fe1bd1f0a6bbb6be452f86a76092bd49b2ee4a",
+        "bytes": 18202391,
+        "downloaded_this_run": false
+      },
+      "2015": {
+        "url": "https://github.com/nflverse/nflverse-data/releases/download/pbp/play_by_play_2015.csv.gz",
+        "local_cache": "data/raw/play_by_play_2015.csv.gz",
+        "retrieved_at_utc": "2026-08-08T16:41:13Z",
+        "sha256": "837811471df06c43d55faede7a363274484da11e71f49d8e0801baede3a5965d",
+        "bytes": 18392969,
+        "downloaded_this_run": false
+      },
+      "2016": {
+        "url": "https://github.com/nflverse/nflverse-data/releases/download/pbp/play_by_play_2016.csv.gz",
+        "local_cache": "data/raw/play_by_play_2016.csv.gz",
+        "retrieved_at_utc": "2026-08-08T16:41:14Z",
+        "sha256": "dc1703d9aae3ec697ac2787617f82b6f074d0c151e1a54f8217f570a63dcb5ed",
+        "bytes": 18230362,
+        "downloaded_this_run": false
+      },
+      "2017": {
+        "url": "https://github.com/nflverse/nflverse-data/releases/download/pbp/play_by_play_2017.csv.gz",
+        "local_cache": "data/raw/play_by_play_2017.csv.gz",
+        "retrieved_at_utc": "2026-08-08T16:41:15Z",
+        "sha256": "74032964ca6bdfc5bbe186253231a533d2d82aa531fac02b9382da01b3a8b34e",
+        "bytes": 17973428,
+        "downloaded_this_run": false
+      },
+      "2018": {
+        "url": "https://github.com/nflverse/nflverse-data/releases/download/pbp/play_by_play_2018.csv.gz",
+        "local_cache": "data/raw/play_by_play_2018.csv.gz",
+        "retrieved_at_utc": "2026-08-08T16:41:16Z",
+        "sha256": "d37899610b397b96a90da6902827de5b46c5457b93e0e16d5f95a8eb524e4a7d",
+        "bytes": 17920627,
+        "downloaded_this_run": false
+      },
+      "2019": {
+        "url": "https://github.com/nflverse/nflverse-data/releases/download/pbp/play_by_play_2019.csv.gz",
+        "local_cache": "data/raw/play_by_play_2019.csv.gz",
+        "retrieved_at_utc": "2026-08-08T16:41:17Z",
+        "sha256": "b764668137052be23745953cbc33fa17e537a70c81e9b73785a19a15e7288216",
+        "bytes": 17992849,
+        "downloaded_this_run": false
+      },
+      "2020": {
+        "url": "https://github.com/nflverse/nflverse-data/releases/download/pbp/play_by_play_2020.csv.gz",
+        "local_cache": "data/raw/play_by_play_2020.csv.gz",
+        "retrieved_at_utc": "2026-08-08T16:41:18Z",
+        "sha256": "8f8be4e1f53aa8b504b52b1a4f38559b4d9a6bf5885a4e70bb50fba4228f4838",
+        "bytes": 18146399,
+        "downloaded_this_run": false
+      },
+      "2021": {
+        "url": "https://github.com/nflverse/nflverse-data/releases/download/pbp/play_by_play_2021.csv.gz",
+        "local_cache": "data/raw/play_by_play_2021.csv.gz",
+        "retrieved_at_utc": "2026-08-08T16:41:19Z",
+        "sha256": "e8743a568f99667a8bdcd29ba12224ee1782ad2b7916bee78ee335c099383739",
+        "bytes": 19022201,
+        "downloaded_this_run": false
+      },
+      "2022": {
+        "url": "https://github.com/nflverse/nflverse-data/releases/download/pbp/play_by_play_2022.csv.gz",
+        "local_cache": "data/raw/play_by_play_2022.csv.gz",
+        "retrieved_at_utc": "2026-08-08T16:41:20Z",
+        "sha256": "0c69a71eb39498956c7b1d5c1ca52ce7fe679934a95d1af249facb5ea9829ea4",
+        "bytes": 19093961,
+        "downloaded_this_run": false
+      },
+      "2023": {
+        "url": "https://github.com/nflverse/nflverse-data/releases/download/pbp/play_by_play_2023.csv.gz",
+        "local_cache": "data/raw/play_by_play_2023.csv.gz",
+        "retrieved_at_utc": "2026-08-08T16:41:21Z",
+        "sha256": "4649804ee0f0a40b41e51ec75a1ce921949d7fab5459213488656b92f78560e8",
+        "bytes": 19169807,
+        "downloaded_this_run": false
+      },
+      "2024": {
+        "url": "https://github.com/nflverse/nflverse-data/releases/download/pbp/play_by_play_2024.csv.gz",
+        "local_cache": "data/raw/play_by_play_2024.csv.gz",
+        "retrieved_at_utc": "2026-08-08T16:41:22Z",
+        "sha256": "f7075073401727c98e2c22f88b5ee9a178a98f1e53e10033f972c8bd6f0e940a",
+        "bytes": 19358612,
+        "downloaded_this_run": false
+      },
+      "2025": {
+        "url": "https://github.com/nflverse/nflverse-data/releases/download/pbp/play_by_play_2025.csv.gz",
+        "local_cache": "data/raw/play_by_play_2025.csv.gz",
+        "retrieved_at_utc": "2026-08-08T16:41:23Z",
+        "sha256": "9c25c980f103d58fae5a0675f572aa4857e4672f6599973c1bc8a50e586a04e6",
+        "bytes": 19109143,
+        "downloaded_this_run": false
+      }
+    },
+    "schedule": {
+      "url": "https://raw.githubusercontent.com/nflverse/nfldata/master/data/games.csv",
+      "local_cache": "data/raw/games.csv",
+      "retrieved_at_utc": "2026-08-08T16:41:23Z",
+      "sha256": "2dabcaa78e8eb6e1901ffac8ce4bee2d36c4979898458bd39632c20d54588009",
+      "bytes": 2175368,
+      "downloaded_this_run": false
+    }
+  },
+  "software": {
+    "python": "3.12.13",
+    "pandas": "3.0.1",
+    "numpy": "2.3.5",
+    "platform": "Windows-11-10.0.26100-SP0"
+  },
+  "method": {
+    "bootstrap_replicates": 10000,
+    "bootstrap_seed": 20260808,
+    "ci": "95% percentile cluster bootstrap, resampling QB or franchise identities",
+    "rolling_windows": [
+      1,
+      2,
+      5
+    ],
+    "qb_headline_threshold": "224 dropbacks in 2006\u20132020; 238 in 2021\u20132025"
+  },
+  "validations": {
+    "team_rows_per_domain_per_season": 32,
+    "regular_season_only": true,
+    "pbp_diagnostics": {
+      "regular_epa_rows": 861534,
+      "qb_dropback_rows": 392550,
+      "missing_qb_epa_rows": 0
+    },
+    "qb_headline_qualifying_seasons": 679
+  }
+}

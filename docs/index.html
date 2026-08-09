@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A reproducible analysis of NFL performance persistence from 2006 through 2025.">
+  <title>NFL performance persistence</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <header class="site-header"><div class="header-inner"><div class="brand"><a href="index.html">NFL performance persistence</a><span>2006–2025 regular seasons · a reproducible year-over-year analysis</span></div><nav aria-label="Main navigation"><a aria-current="page" href="index.html">Summary</a><a href="individual_qb.html">Individual QB</a><a href="team_qb.html">Team QB</a><a href="offense.html">Offense</a><a href="defense.html">Defense</a><a href="record.html">Record</a><a href="methodology.html">Methods &amp; sources</a></nav></div></header>
+  <main>
+    <section class="hero"><p class="eyebrow">The main answer</p><h1>What sticks from one NFL season to the next?</h1><p class="lede">This analysis measures the association between an entity’s previous 1, 2, or 5 seasons and its following season. It is intentionally a transparent persistence study, not a full forecasting model.</p></section>
+    <section class="stat-strip"><div class="metric-card"><strong>5 domains</strong><span>Individual QB, team QB, offense, defense, record</span></div><div class="metric-card"><strong>15 estimates</strong><span>Three strict history windows for every domain</span></div><div class="metric-card"><strong>95% CIs</strong><span>Cluster bootstrap by QB or franchise identity</span></div></section>
+    <section class="panel" data-results><h2>Headline persistence results</h2><div id="headline-table" class="loading">Loading calculated results…</div></section>
+    <section class="panel" data-results><h2>Confidence-interval comparison</h2><p class="muted">Orange dots are the headline Pearson estimates; blue spans are 95% cluster-bootstrap intervals. The x-axis uses the same -1 to 1 scale for every row.</p><div id="interval-chart" class="loading">Loading comparison chart…</div></section>
+    <section class="two-column"><div class="panel"><h2>How to read it</h2><p>Every result correlates an equally weighted prior-history average with next-season performance. A larger positive correlation means the earlier performance contains more signal about the next year. The chart and table include sample size because strict five-year QB eligibility is intentionally selective.</p><p>For rank-based and outlier-resistant context, every domain page also reports Spearman correlation, 2020-excluded results, and leave-one-entity-out influence.</p></div><aside class="callout"><h3>Consistent orientation</h3><p>Higher is better in every domain. Defense is shown as EPA prevented per play, the negative of EPA allowed.</p><p><a href="methodology.html">Read metric choices, sources, and limits →</a></p></aside></section>
+  </main>
+  <footer class="site-footer"><div class="footer-inner"><span data-generated>Built from public nflverse sources.</span> · <a href="https://github.com/eeberman/nfl-year-over-year-persistence">View source and reproduce</a></div></footer>
+  <script src="assets/app.js"></script>
+</body>
+</html>
