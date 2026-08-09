@@ -59,6 +59,9 @@ td.numeric { font-variant-numeric: tabular-nums; white-space: nowrap; }
 .controls { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 6px; }
 button { background: white; color: var(--ink); border: 1px solid #b9c6d8; border-radius: 999px; padding: 7px 12px; font: inherit; font-size: .86rem; cursor: pointer; }
 button:hover, button[aria-pressed="true"] { background: var(--blue); border-color: var(--blue); color: white; }
+.scatter-filters { display: flex; flex-wrap: wrap; gap: 12px; margin: 12px 0; padding: 12px; background: #f4f7fb; border: 1px solid var(--line); border-radius: 9px; }
+.scatter-filters label { display: grid; gap: 4px; color: #33425c; font-size: .78rem; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; }
+.scatter-filters select { min-width: 150px; background: white; color: var(--ink); border: 1px solid #b9c6d8; border-radius: 6px; padding: 7px 9px; font: inherit; font-size: .88rem; text-transform: none; }
 .svg-wrap { overflow-x: auto; margin-top: 10px; }
 svg { display: block; width: 100%; min-width: 640px; height: auto; }
 .chart-axis { stroke: #aeb9c8; stroke-width: 1; }
@@ -66,7 +69,12 @@ svg { display: block; width: 100%; min-width: 640px; height: auto; }
 .chart-label { fill: #536078; font-size: 12px; }
 .chart-title { fill: #1b2b47; font-size: 13px; font-weight: 650; }
 .chart-point { fill: var(--blue); fill-opacity: .6; stroke: #0b4a92; stroke-width: .6; }
+.chart-point:hover, .chart-point:focus { fill: var(--orange); fill-opacity: 1; stroke-width: 1.4; outline: none; }
 .chart-line { stroke: var(--orange); stroke-width: 2.5; }
+.scatter-plot { position: relative; }
+.chart-tooltip { position: absolute; z-index: 2; width: min(330px, calc(100% - 16px)); padding: 10px 12px; border: 1px solid #9ab6d8; border-radius: 8px; background: rgba(255, 255, 255, .98); box-shadow: 0 8px 20px rgba(20, 33, 61, .17); color: var(--ink); font-size: .82rem; line-height: 1.35; pointer-events: none; }
+.chart-tooltip strong, .chart-tooltip span { display: block; }
+.chart-tooltip span + span { margin-top: 4px; color: var(--muted); }
 .ci-line { stroke: var(--blue); stroke-width: 5; stroke-linecap: round; }
 .ci-dot { fill: var(--orange); }
 .robustness { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 14px; }

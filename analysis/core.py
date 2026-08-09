@@ -137,8 +137,9 @@ def aggregate_player_qb_seasons(rows: pd.DataFrame) -> pd.DataFrame:
     """Aggregate player QB rows across teams into one player-season observation.
 
     Expected input columns are season, player_id, player_name, qb_epa, and
-    dropbacks.  The player ID (rather than display name or team) defines the
-    individual-QB unit.
+    dropbacks.  A franchise column is optional; when present it is retained as
+    a stable, display-only sequence for the interactive chart.  The player ID
+    (rather than display name or team) always defines the individual-QB unit.
     """
 
     required = {"season", "player_id", "player_name", "qb_epa", "dropbacks"}
@@ -155,8 +156,20 @@ def aggregate_player_qb_seasons(rows: pd.DataFrame) -> pd.DataFrame:
         [["season", "player_id", "player_name"]]
     )
     out = numeric.merge(labels, on=["season", "player_id"], how="left")
+    if "franchise" in clean.columns:
+        team_sequences = (
+            clean.dropna(subset=["franchise"])
+            .assign(franchise=lambda frame: frame["franchise"].map(canonical_franchise))
+            .groupby(["season", "player_id"], as_index=False)["franchise"]
+            .agg(lambda teams: " / ".join(sorted(set(teams))))
+            .rename(columns={"franchise": "team_sequence"})
+        )
+        out = out.merge(team_sequences, on=["season", "player_id"], how="left", validate="one_to_one")
     out["metric"] = out["qb_epa"] / out["dropbacks"]
-    return out[["season", "player_id", "player_name", "qb_epa", "dropbacks", "metric"]]
+    columns = ["season", "player_id", "player_name", "qb_epa", "dropbacks", "metric"]
+    if "team_sequence" in out:
+        columns.append("team_sequence")
+    return out[columns]
 
 
 def construct_strict_pairs(
@@ -165,6 +178,7 @@ def construct_strict_pairs(
     entity_col: str,
     metric_col: str = "metric",
     label_col: str | None = None,
+    team_col: str | None = None,
     window: int,
 ) -> pd.DataFrame:
     """Build complete rolling-history pairs, never averaging partial histories."""
@@ -176,7 +190,11 @@ def construct_strict_pairs(
     if window not in WINDOWS:
         raise ValidationError(f"Unsupported window {window}; expected one of {WINDOWS}.")
 
-    frame = metric_df[["season", entity_col, metric_col] + ([label_col] if label_col else [])].copy()
+    columns = ["season", entity_col, metric_col]
+    for column in [label_col, team_col]:
+        if column and column not in columns:
+            columns.append(column)
+    frame = metric_df[columns].copy()
     frame = frame.dropna(subset=[entity_col, metric_col])
     if frame.duplicated([entity_col, "season"]).any():
         raise ValidationError("Metric data must contain only one row per entity-season.")
@@ -190,6 +208,14 @@ def construct_strict_pairs(
             .set_index(entity_col)[label_col]
             .to_dict()
         )
+    teams: dict[tuple[Any, int], list[str]] = {}
+    if team_col:
+        team_values = frame[[entity_col, "season"]].copy()
+        team_values["_team"] = frame[team_col]
+        team_values = team_values.set_index([entity_col, "season"])["_team"].dropna()
+        for (entity, season), raw_value in team_values.items():
+            team_list = [team.strip() for team in str(raw_value).split("/") if team.strip()]
+            teams[(entity, int(season))] = team_list
 
     pairs: list[dict[str, Any]] = []
     entities = sorted(frame[entity_col].unique())
@@ -207,6 +233,10 @@ def construct_strict_pairs(
                     "history_start": history[0],
                     "history_end": history[-1],
                     "target_season": target_season,
+                    "history_team_sequence": [
+                        {"season": year, "teams": teams.get((entity, year), [])} for year in history
+                    ],
+                    "target_teams": teams.get((entity, target_season), []),
                     "predictor": float(np.mean(values)),
                     "outcome": float(target),
                     "touches_2020": 2020 in history or target_season == 2020,
@@ -220,6 +250,8 @@ def construct_strict_pairs(
             "history_start",
             "history_end",
             "target_season",
+            "history_team_sequence",
+            "target_teams",
             "predictor",
             "outcome",
             "touches_2020",
@@ -315,17 +347,23 @@ def summarize_pairs(
         slope, intercept = np.polyfit(pairs["predictor"], pairs["outcome"], 1)
     points = []
     for row in pairs.itertuples(index=False):
-        points.append(
-            {
-                "entity": str(row.entity),
-                "label": str(row.entity_label),
-                "history_start": int(row.history_start),
-                "history_end": int(row.history_end),
-                "target_season": int(row.target_season),
-                "predictor": float(row.predictor),
-                "outcome": float(row.outcome),
-            }
-        )
+        point = {
+            "entity": str(row.entity),
+            "label": str(row.entity_label),
+            "history_start": int(row.history_start),
+            "history_end": int(row.history_end),
+            "target_season": int(row.target_season),
+            "predictor": float(row.predictor),
+            "outcome": float(row.outcome),
+        }
+        # Team history is needed only for player-level points.  Keep the site
+        # payload compact by deriving franchise-chart team identity from entity.
+        if row.target_teams:
+            point["history_teams"] = "|".join(
+                " / ".join(step["teams"]) for step in row.history_team_sequence
+            )
+            point["target_teams"] = "|".join(row.target_teams)
+        points.append(point)
     return {
         "pearson_r": pearson,
         "spearman_rho": spearman,

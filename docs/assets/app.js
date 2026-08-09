@@ -66,12 +66,27 @@ function renderDomain(data, domainId) {
     element("qualification").innerHTML = `<div class="callout"><strong>QB sample</strong><p>${esc(domain.qualification.headline_rule)} ${domain.qualification.qualifying_qb_seasons} qualifying QB-seasons from ${domain.qualification.qualifying_qbs} quarterbacks.</p></div>`;
   }
   const controls = element("window-controls");
+  const state = { window: 1, year: "all", team: "all" };
+  const refreshScatter = ({ refreshFilters = false } = {}) => {
+    if (refreshFilters) renderScatterFilters(domain, state);
+    renderScatter(domain, state);
+  };
   controls.innerHTML = [1, 2, 5].map(window => `<button type="button" data-window="${window}" aria-pressed="${window === 1}">Prior ${window === 1 ? "year" : `${window}-year average`}</button>`).join("");
   controls.querySelectorAll("button").forEach(button => button.addEventListener("click", () => {
+    state.window = Number(button.dataset.window);
     controls.querySelectorAll("button").forEach(other => other.setAttribute("aria-pressed", String(other === button)));
-    renderScatter(domain, Number(button.dataset.window));
+    refreshScatter({ refreshFilters: true });
   }));
-  renderScatter(domain, 1);
+  if (!element("scatter-filters")) {
+    controls.insertAdjacentHTML("afterend", '<div id="scatter-filters" class="scatter-filters" aria-label="Scatterplot filters"></div>');
+  }
+  element("scatter-filters").addEventListener("change", event => {
+    const filter = event.target.dataset.filter;
+    if (!filter) return;
+    state[filter] = event.target.value;
+    refreshScatter();
+  });
+  refreshScatter({ refreshFilters: true });
   renderRobustness(domain);
 }
 
@@ -81,7 +96,118 @@ function niceRange(values) {
   return [min - spread * .12, max + spread * .12];
 }
 
-function renderScatter(domain, window) {
+function renderScatterFilters(domain, state) {
+  const holder = element("scatter-filters");
+  const allPoints = domain.windows[String(state.window)].points;
+  const years = [...new Set(allPoints.map(point => point.target_season))].sort((a, b) => a - b);
+  const teams = [...new Set(allPoints.flatMap(point => pointTargetTeams(point)))].sort();
+  if (state.year !== "all" && !years.includes(Number(state.year))) state.year = "all";
+  if (state.team !== "all" && !teams.includes(state.team)) state.team = "all";
+  const yearOptions = ["<option value=\"all\">All years</option>", ...years.map(year => `<option value="${year}"${String(year) === state.year ? " selected" : ""}>${year}</option>`)].join("");
+  const teamOptions = ["<option value=\"all\">All teams</option>", ...teams.map(team => `<option value="${esc(team)}"${team === state.team ? " selected" : ""}>${esc(team)}</option>`)].join("");
+  holder.innerHTML = `<label>Following season<select data-filter="year" aria-label="Filter scatterplot by following season">${yearOptions}</select></label><label>Following team<select data-filter="team" aria-label="Filter scatterplot by following team">${teamOptions}</select></label>`;
+}
+
+function teamList(teams) {
+  return teams?.length ? teams.join(" / ") : "Team unavailable";
+}
+
+function pointTargetTeams(point) {
+  return point.target_teams ? point.target_teams.split("|") : [point.entity];
+}
+
+function pointHistoryTeams(point) {
+  if (point.history_teams) return point.history_teams.split("|");
+  return Array.from({length: point.history_end - point.history_start + 1}, () => point.entity);
+}
+
+function sequenceText(point) {
+  const history = pointHistoryTeams(point)
+    .map((teams, index) => `${point.history_start + index}: ${teams || "Team unavailable"}`)
+    .join("  |  ");
+  return `${history || "History team unavailable"}  ->  ${point.target_season}: ${teamList(pointTargetTeams(point))}`;
+}
+
+function pointTooltip(point) {
+  return `<strong>${esc(point.label)}</strong><span>Team sequence: ${esc(sequenceText(point))}</span><span>Prior: ${number(point.predictor)} | Next: ${number(point.outcome)}</span>`;
+}
+
+function pointTitle(point) {
+  return `${point.label}\nTeam sequence: ${sequenceText(point)}\nPrior: ${number(point.predictor)} | Next: ${number(point.outcome)}`;
+}
+
+function fitLine(points) {
+  if (points.length < 2) return { slope: Number.NaN, intercept: Number.NaN };
+  const xMean = points.reduce((sum, point) => sum + point.predictor, 0) / points.length;
+  const yMean = points.reduce((sum, point) => sum + point.outcome, 0) / points.length;
+  const denominator = points.reduce((sum, point) => sum + (point.predictor - xMean) ** 2, 0);
+  if (denominator === 0) return { slope: Number.NaN, intercept: Number.NaN };
+  const slope = points.reduce((sum, point) => sum + (point.predictor - xMean) * (point.outcome - yMean), 0) / denominator;
+  return { slope, intercept: yMean - slope * xMean };
+}
+
+function attachScatterTooltip(holder, points) {
+  const tooltip = holder.querySelector(".chart-tooltip");
+  const place = (event, circle) => {
+    const holderRect = holder.getBoundingClientRect();
+    const circleRect = circle.getBoundingClientRect();
+    const clientX = event?.clientX ?? (circleRect.left + circleRect.width / 2);
+    const clientY = event?.clientY ?? (circleRect.top + circleRect.height / 2);
+    const maxLeft = Math.max(8, holderRect.width - tooltip.offsetWidth - 8);
+    const maxTop = Math.max(8, holderRect.height - tooltip.offsetHeight - 8);
+    tooltip.style.left = `${Math.min(maxLeft, Math.max(8, clientX - holderRect.left + 12))}px`;
+    tooltip.style.top = `${Math.min(maxTop, Math.max(8, clientY - holderRect.top + 12))}px`;
+  };
+  holder.querySelectorAll(".chart-point").forEach(circle => {
+    const point = points[Number(circle.dataset.pointIndex)];
+    const show = event => {
+      tooltip.innerHTML = pointTooltip(point);
+      tooltip.hidden = false;
+      place(event, circle);
+    };
+    circle.addEventListener("pointerenter", show);
+    circle.addEventListener("pointermove", show);
+    circle.addEventListener("pointerleave", () => { tooltip.hidden = true; });
+    circle.addEventListener("focus", () => show());
+    circle.addEventListener("blur", () => { tooltip.hidden = true; });
+  });
+}
+
+function renderScatter(domain, state) {
+  const stats = domain.windows[String(state.window)];
+  const allPoints = stats.points;
+  const points = allPoints.filter(point => (
+    (state.year === "all" || point.target_season === Number(state.year))
+    && (state.team === "all" || pointTargetTeams(point).includes(state.team))
+  ));
+  const holder = element("scatter-chart");
+  const context = element("scatter-context");
+  const activeFilters = [state.year === "all" ? null : `season ${state.year}`, state.team === "all" ? null : `team ${state.team}`].filter(Boolean);
+  const scope = activeFilters.length ? ` Filtered to ${activeFilters.join(", ")}.` : "";
+  context.textContent = `Showing ${points.length} of ${stats.n_pairs} eligible pairs.${scope} Full-sample Pearson r = ${number(stats.pearson_r)} (95% CI ${ci(stats)}).`;
+  if (!points.length) {
+    holder.innerHTML = "<p class='muted'>No eligible pairs match this filter combination.</p>";
+    return;
+  }
+  const width = 860, height = 530, margin = { left: 76, right: 28, top: 35, bottom: 75 };
+  const xr = niceRange(points.map(point => point.predictor));
+  const yr = niceRange(points.map(point => point.outcome));
+  const x = value => margin.left + ((value - xr[0]) / (xr[1] - xr[0])) * (width - margin.left - margin.right);
+  const y = value => height - margin.bottom - ((value - yr[0]) / (yr[1] - yr[0])) * (height - margin.top - margin.bottom);
+  const ticks = (range, axis) => Array.from({length: 5}, (_, index) => range[0] + (index * (range[1] - range[0]) / 4)).map(value => {
+    const position = axis === "x" ? x(value) : y(value);
+    const line = axis === "x" ? `<line class="chart-grid" x1="${position}" y1="${margin.top}" x2="${position}" y2="${height - margin.bottom}"/>` : `<line class="chart-grid" x1="${margin.left}" y1="${position}" x2="${width - margin.right}" y2="${position}"/>`;
+    const label = axis === "x" ? `<text class="chart-label" x="${position}" y="${height - margin.bottom + 20}" text-anchor="middle">${number(value)}</text>` : `<text class="chart-label" x="${margin.left - 10}" y="${position + 4}" text-anchor="end">${number(value)}</text>`;
+    return line + label;
+  }).join("");
+  const regression = fitLine(points);
+  const trend = Number.isFinite(regression.slope) ? `<line class="chart-line" x1="${x(xr[0])}" y1="${y(regression.slope * xr[0] + regression.intercept)}" x2="${x(xr[1])}" y2="${y(regression.slope * xr[1] + regression.intercept)}"/>` : "";
+  const dots = points.map((point, index) => `<circle class="chart-point" data-point-index="${index}" cx="${x(point.predictor)}" cy="${y(point.outcome)}" r="4" tabindex="0" role="img" aria-label="${esc(pointTitle(point))}"><title>${esc(pointTitle(point))}</title></circle>`).join("");
+  holder.innerHTML = `<div class="scatter-plot"><div class="svg-wrap"><svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Scatterplot of prior performance against next-season performance"><text class="chart-title" x="${margin.left}" y="18">${esc(domain.metric_label)}</text>${ticks(xr, "x")}${ticks(yr, "y")}<line class="chart-axis" x1="${margin.left}" y1="${height - margin.bottom}" x2="${width - margin.right}" y2="${height - margin.bottom}"/><line class="chart-axis" x1="${margin.left}" y1="${margin.top}" x2="${margin.left}" y2="${height - margin.bottom}"/>${trend}${dots}<text class="chart-label" x="${(margin.left + width - margin.right) / 2}" y="${height - 20}" text-anchor="middle">Prior ${state.window === 1 ? "season" : `${state.window}-season average`}</text><text class="chart-label" transform="translate(19 ${(margin.top + height - margin.bottom) / 2}) rotate(-90)" text-anchor="middle">Following season</text><text class="chart-label" x="${width - margin.right}" y="${margin.top + 14}" text-anchor="end">Orange line: filtered OLS trend</text></svg></div><div class="chart-tooltip" role="status" aria-live="polite" hidden></div></div>`;
+  attachScatterTooltip(holder, points);
+}
+
+function renderScatterLegacy(domain, window) {
   const stats = domain.windows[String(window)];
   const points = stats.points;
   const holder = element("scatter-chart");

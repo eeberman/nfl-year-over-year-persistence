@@ -143,7 +143,7 @@ def build_pbp_metrics(
             player_qb = qb.loc[qb["passer_player_id"].notna()].copy()
             diagnostics["missing_qb_epa_rows"] += int(player_qb["qb_epa"].isna().sum())
             player_parts.append(
-                player_qb.groupby(["passer_player_id", "passer_player_name"], dropna=False, as_index=False).agg(
+                player_qb.groupby(["franchise", "passer_player_id", "passer_player_name"], dropna=False, as_index=False).agg(
                     qb_epa=("qb_epa", "sum"), dropbacks=("qb_dropback", "sum")
                 )
                 .rename(columns={"passer_player_id": "player_id", "passer_player_name": "player_name"})
@@ -257,6 +257,7 @@ def analyze_domain(
     *,
     entity_col: str,
     label_col: str | None,
+    team_col: str | None,
     metric_label: str,
     metric_description: str,
     unit_description: str,
@@ -267,7 +268,13 @@ def analyze_domain(
     windows: dict[str, Any] = {}
     raw_pairs: dict[int, pd.DataFrame] = {}
     for window_index, window in enumerate(WINDOWS):
-        pairs = construct_strict_pairs(frame, entity_col=entity_col, label_col=label_col, window=window)
+        pairs = construct_strict_pairs(
+            frame,
+            entity_col=entity_col,
+            label_col=label_col,
+            team_col=team_col,
+            window=window,
+        )
         raw_pairs[window] = pairs
         summary = summarize_pairs(pairs, bootstrap_seed=BOOTSTRAP_SEED + 100 * window_index + len(domain_key))
         excluding_2020 = pairs.loc[~pairs["touches_2020"]].copy()
@@ -359,7 +366,7 @@ def main() -> None:
         raise ValidationError("No individual QB seasons passed the headline playing-time threshold.")
 
     frames = {
-        "individual_qb": headline_qb[["season", "player_id", "player_name", "metric"]].copy(),
+        "individual_qb": headline_qb[["season", "player_id", "player_name", "team_sequence", "metric"]].copy(),
         "team_qb": make_team_domain_frame(team_seasons, "team_qb_metric"),
         "offense": make_team_domain_frame(team_seasons, "offense_metric"),
         "defense": make_team_domain_frame(team_seasons, "defense_metric"),
@@ -370,6 +377,7 @@ def main() -> None:
     for spec in DOMAINS:
         notes = []
         label_col = "player_name" if spec.key == "individual_qb" else None
+        team_col = "team_sequence" if spec.key == "individual_qb" else None
         if spec.key == "individual_qb":
             notes = [
                 "Headline eligibility is 224 dropbacks in 2006–2020 and 238 in 2021–2025.",
@@ -384,6 +392,7 @@ def main() -> None:
             frames[spec.key],
             entity_col=spec.entity_col,
             label_col=label_col,
+            team_col=team_col,
             metric_label=spec.metric_label,
             metric_description=spec.metric_description,
             unit_description=spec.unit_description,

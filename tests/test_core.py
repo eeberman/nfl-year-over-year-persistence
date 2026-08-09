@@ -31,6 +31,7 @@ class CoreTests(unittest.TestCase):
                 "season": [2021, 2021],
                 "player_id": ["QB1", "QB1"],
                 "player_name": ["Quarter Back", "Quarter Back"],
+                "franchise": ["OAK", "LAC"],
                 "qb_epa": [10.0, 5.0],
                 "dropbacks": [100, 50],
             }
@@ -39,6 +40,7 @@ class CoreTests(unittest.TestCase):
         self.assertEqual(len(out), 1)
         self.assertEqual(out.loc[0, "dropbacks"], 150)
         self.assertAlmostEqual(out.loc[0, "metric"], 0.1)
+        self.assertEqual(out.loc[0, "team_sequence"], "LAC / LV")
 
     def test_strict_windows_never_fill_missing_history(self) -> None:
         rows = pd.DataFrame(
@@ -51,6 +53,19 @@ class CoreTests(unittest.TestCase):
         pairs = construct_strict_pairs(rows, entity_col="entity", window=2)
         self.assertEqual(pairs[["history_start", "history_end", "target_season"]].values.tolist(), [[2006, 2007, 2008]])
         self.assertEqual(len(construct_strict_pairs(rows, entity_col="entity", window=5)), 0)
+
+    def test_pair_team_sequences_support_filters_and_tooltips(self) -> None:
+        rows = pd.DataFrame(
+            {
+                "season": [2006, 2007, 2008],
+                "entity": ["QB1"] * 3,
+                "team": ["CAR", "CAR", "CHI"],
+                "metric": [1.0, 2.0, 3.0],
+            }
+        )
+        pair = construct_strict_pairs(rows, entity_col="entity", team_col="team", window=2).iloc[0]
+        self.assertEqual(pair["history_team_sequence"], [{"season": 2006, "teams": ["CAR"]}, {"season": 2007, "teams": ["CAR"]}])
+        self.assertEqual(pair["target_teams"], ["CHI"])
 
     def test_tie_is_half_win(self) -> None:
         self.assertAlmostEqual(calculate_win_pct(8, 7, 1), 0.53125)
